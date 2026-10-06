@@ -1,0 +1,9 @@
+<?php require 'layout.php';$t=$_GET['token']??($_POST['token']??'');$s=db()->prepare('SELECT * FROM invites WHERE token=? AND used=0');$s->execute([$t]);$iv=$s->fetch();$err='';
+if($iv&&$_SERVER['REQUEST_METHOD']=='POST'){check_csrf();$nm=trim($_POST['name']??'');$pw=$_POST['password']??'';
+ if($nm==='')$err='Enter your name.';elseif(strlen($pw)<8)$err='Use a password of at least 8 characters.';
+ else{try{db()->prepare("INSERT INTO users(name,email,password,role) VALUES(?,?,?,'instructor')")->execute([$nm,$iv['email'],password_hash($pw,PASSWORD_DEFAULT)]);$id=db()->lastInsertId();db()->prepare('UPDATE invites SET used=1 WHERE id=?')->execute([$iv['id']]);session_regenerate_id(true);$_SESSION['user']=['id'=>$id,'name'=>$nm,'email'=>$iv['email'],'role'=>'instructor'];go('dashboard.php?welcome=1');}catch(PDOException $x){$err='An account with this email already exists. Sign in instead.';}}}
+head('Instructor invitation','authpage');?>
+<main class="authwrap"><div class="authcard rise" style="--i:0"><img src="assets/logo.svg" class="alogo" alt="">
+<?php if(!$iv):?><h1>This invitation is not valid</h1><p class="tag">It may have been used already. Ask your administrator for a new link.</p><a class="btn solid" href="index.php" style="display:flex">Return home</a>
+<?php else:?><h1>Join as an instructor</h1><p class="tag">Create your account for <?=e($iv['email'])?>.</p>
+<form method="post" class="mailform open"><div><?=csrf()?><input type="hidden" name="token" value="<?=e($t)?>"><?php if($err):?><p class="err"><?=e($err)?></p><?php endif;?><label>Your name<input name="name" required value="<?=e($_POST['name']??'')?>"></label><label>Password (8+ characters)<input type="password" name="password" required></label><button class="btn solid">Create account</button></div></form><?php endif;?></div></main><?php foot();

@@ -1,0 +1,2 @@
+<?php require 'layout.php';hub_start('Privacy','');?><div class="legal"><h1 class="h">Privacy practices</h1><p class="sub">Last updated <?=date('F j, Y')?>. Replace this text with your own policy before launch.</p>
+<h2>What we keep</h2><p>Your name, email, hashed password, Discovery Journey answers and bookmarks.</p><h2>How we use it</h2><p>To run your dashboard and personalise the Hub. We do not sell your information.</p><h2>Your choices</h2><p>Ask the Left2Right team to export or delete your account at any time.</p></div><?php hub_end();
